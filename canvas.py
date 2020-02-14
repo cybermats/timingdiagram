@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from signal import Signal
+from signals.signal import Signal
 
 
 class Canvas:
@@ -14,8 +14,9 @@ class Canvas:
         self.foreground = (0, 0, 0)
         self.image = None
         self.draw = None
+        self.fontfile = "fonts/Roboto-Regular.ttf"
 
-        self.font = ImageFont.truetype("arial.ttf", 15)
+        self.font = ImageFont.truetype(self.fontfile, 15)
 
         self.signals = []
         self.oldest = None

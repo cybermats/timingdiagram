@@ -1,4 +1,5 @@
-from signal import TickerSignal, SignalCollection, CounterSignal
+from signals.signal import TickerSignal, CounterSignal
+from signals.utils import SignalCollection
 from canvas import Canvas
 
 def main():
