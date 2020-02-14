@@ -103,7 +103,13 @@ class CounterSignal(FlipSignal):
   def context(self, s_name, old_state, new_state, current_time, next_time):
     if (old_state == self.old_state_trigger and
         new_state == self.new_state_trigger):
-      trigger_time = current_time + self.delay
+      trigger_time = current_time
+      if self.delay is not None:
+        if isinstance(self.delay, dict):
+          trigger_time += self.delay[self.state]
+        else:
+          trigger_time += self.delay
+          
       self.causes.append(_Cause(orig_name=s_name, orig_time=current_time,
                                 event_name=self.name, event_time=trigger_time))
       return trigger_time
@@ -137,12 +143,19 @@ class ParameterSignal(FlipSignal):
     self.cause.add_cause(s_name, current_time)
     true_state = self._check_state()
     if true_state != self.current_state:
-      trigger_time = current_time + self.delay
+      trigger_time = current_time
+      if self.delay is not None:
+        if isinstance(self.delay, dict):
+          trigger_time += self.delay[self.state]
+        else:
+          trigger_time += self.delay
+          
       self.cause.add_event(self.name, trigger_time)
       self.causes.append(self.cause)
       self.cause = _Cause()
       self.current_state = true_state
       return trigger_time
+     
     
   def set_dependency_state(self, name, value):
     self.dependency_states[name] = value

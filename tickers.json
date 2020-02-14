@@ -28,7 +28,8 @@
     	    "dependencies": ["CNT_2"],
 	    "visible": true,
 	    "show_cause": false,
-	    "initial_state": "HIGH"
+	    "initial_state": "HIGH",
+	    "delay": 20
 	},
 	{
 	    "type": "parameter",
@@ -39,7 +40,8 @@
 		"CHR_CLK": "HIGH"
 	    },
 	    "show_cause": false,
-	    "visible": true
+	    "visible": true,
+	    "delay": 20
 	},
 	{
 	    "type": "counter",
@@ -60,7 +62,35 @@
 	    "initial_state": "DATA",
 	    "states": ["DATA"],
 	    "delay": 160
+	},
+	{
+	    "type": "counter",
+	    "name": "CHAR",
+	    "old_state_trigger": "DATA",
+	    "new_state_trigger": "DATA",
+	    "dependencies": ["MA"],
+	    "initial_state": "UNDEFINED",
+	    "states": ["DATA", "UNDEFINED"],
+	    "delay": {
+		"DATA": 0,
+		"UNDEFINED": 150
+	    }
+	},
+	{
+	    "type": "parameter",
+	    "name": "FONT",
+	    "true_state": {
+		"RA": "DATA",
+		"CHAR": "DATA"
+	    },
+	    "initial_state": "UNDEFINED",
+	    "states": ["DATA", "UNDEFINED"],
+	    "delay": {
+		"DATA": 0,
+		"UNDEFINED": 150
+	    }
 	}
+	
     ],
     "canvas": {
 	"height": 40,
