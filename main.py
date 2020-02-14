@@ -17,8 +17,11 @@ def main(filename):
     sc = SignalCollection()
     for signal in signals:
         sc.add(signal)
-    
+
     until_time=600
+    if "time" in data:
+        until_time = data["time"]
+    
     while sc.tick(until_time):
         continue
 
