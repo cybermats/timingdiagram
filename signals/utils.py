@@ -22,6 +22,7 @@ class SignalCollection():
         if not dependency in self.dependent:
           raise KeyError("All dependencies has not been registred.")
         self.dependent[dependency].append(signal)
+        signal.set_dependency_state(dependency, self.all[dependency].state)
 
   def tick(self, until_time):
     current_time, s = self.heap.pop_signal()

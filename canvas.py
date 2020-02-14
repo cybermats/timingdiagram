@@ -50,12 +50,13 @@ class Canvas:
         if not signal.visible:
             return
         name = signal.name
-        history = signal.get_history()
+        history = signal.history
         self.signals.append((name, history))
 
         age, _ = history[-1]
-        if not self.oldest or self.oldest < age:
-            self.oldest = age
+        if age is not None:
+            if not self.oldest or self.oldest < age:
+                self.oldest = age
 
     def render(self):
         width = int(self.h_spacing +

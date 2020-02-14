@@ -25,6 +25,7 @@ def main(filename):
     cvs = Canvas(data["canvas"])
     for signal in signals:
         cvs.add_signal(signal)
+        print(signal.name, signal.history)
         
     cvs.render()
     cvs.show()
