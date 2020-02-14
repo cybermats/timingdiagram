@@ -163,7 +163,6 @@ class _Cause():
                orig_time=None,
                event_name=None,
                event_time=None):
-    print(orig_name, orig_time, event_name, event_time)
     self.dependencies = {}
     if orig_name is not None and orig_time is not None:
       self.dependencies[orig_name] = orig_time
@@ -171,11 +170,9 @@ class _Cause():
       self.event = (event_name, event_time)
 
   def add_cause(self, name, time):
-    print("add cause", name, time)
     self.dependencies[name] = time
 
   def add_event(self, name, time):
-    print("add event", name, time)
     self.event = (name, time)
 
 

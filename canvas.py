@@ -122,7 +122,6 @@ class Canvas:
             for d_name, d_time in cause.dependencies.items():
                 if d_name not in starts:
                     continue
-                print(d_name, d_time)
                 start_x = d_time * self.time_multiplier + self.h_spacing
                 start_y = starts[d_name] + self.height/2
                 cause_lines.append([(start_x, start_y), (end_x, end_y)])
