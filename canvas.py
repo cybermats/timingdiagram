@@ -89,7 +89,8 @@ class Canvas:
 
             if prev_time and prev_time < self.oldest:
                 lines += self._get_shape(prev_time, prev_state,
-                                         self.oldest, prev_state)
+                                         self.oldest, prev_state,
+                                         last=True)
 
             for line in lines:
               line = [(x + self.h_spacing, y + start) for
@@ -98,7 +99,7 @@ class Canvas:
 
             start = start + self.height + self.v_spacing
 
-    def _get_shape(self, prev_time, prev_state, curr_time, curr_state):
+    def _get_shape(self, prev_time, prev_state, curr_time, curr_state, last=False):
       lines = []
       #
       # Transition from LOW to HIGH
@@ -172,6 +173,25 @@ class Canvas:
 
 
       #
+      # Change of DATA on the bus
+      #
+      elif prev_state == Signal.DATA and curr_state == Signal.DATA and not last:
+        prev_x = prev_time * self.time_multiplier
+        curr_x = curr_time * self.time_multiplier
+
+        # Box
+        lines.append([(prev_x + self.slope_time, 0),
+              (curr_x - self.slope_time, 0)])
+        lines.append([(prev_x + self.slope_time, self.height),
+              (curr_x - self.slope_time, self.height)])
+        # Slope
+        lines.append([(curr_x - self.slope_time, 0),
+              (curr_x + self.slope_time, self.height)])
+        lines.append([(curr_x - self.slope_time, self.height),
+              (curr_x + self.slope_time, 0)])
+
+
+      #
       # Transition from the same states
       #
       elif prev_state == curr_state:
@@ -202,7 +222,7 @@ class Canvas:
           lines.append([(prev_x + self.slope_time, self.height),
                         (curr_x - self.slope_time, self.height)])
 
-        elif prev_state == Signal.UNKNOWN:
+        elif prev_state == Signal.UNDEFINED:
           prev_x = prev_time * self.time_multiplier
           curr_x = curr_time * self.time_multiplier
 
