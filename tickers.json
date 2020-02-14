@@ -1,0 +1,42 @@
+{
+    "signals": [
+	{
+	    "type": "ticker",
+	    "name": "CLK",
+	    "period": 20
+	},
+	{
+	    "type": "counter",
+	    "name": "CNT_1",
+	    "dependencies": ["CLK"],
+	    "visible": true
+	},
+	{
+	    "type": "counter",
+	    "name": "CNT_2",
+	    "old_state_trigger": "HIGH",
+	    "new_state_trigger": "LOW",
+    	    "dependencies": ["CNT_1"],
+	    "visible": true
+	},
+	{
+	    "type": "counter",
+	    "name": "CNT_3",
+	    "old_state_trigger": "HIGH",
+	    "new_state_trigger": "LOW",
+    	    "dependencies": ["CNT_2"]
+	}
+    ],
+    "canvas": {
+	"height": 40,
+	"h_spacing": 60,
+	"v_spacing": 40,
+	"start": 40,
+	"time_multiplier": 2,
+	"slope_time": 0,
+	"background": [ 255, 255, 255],
+	"foreground": [ 0, 0, 0 ],
+	"font_file": "fonts/Roboto-Regular.ttf",
+	"font_size": 15
+    }
+}

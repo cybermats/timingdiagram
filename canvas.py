@@ -3,7 +3,7 @@ from signals.signal import Signal
 
 
 class Canvas:
-    def __init__(self, width, height):
+    def __init__(self, data=None):
         self.height = 40
         self.h_spacing = 60
         self.v_spacing = 40
@@ -12,16 +12,43 @@ class Canvas:
         self.slope_time = 5
         self.background = (255, 255, 255)
         self.foreground = (0, 0, 0)
+        self.font_file = "fonts/Roboto-Regular.ttf"
+        self.font_size = 15
+
+        if data:
+            if "height" in data:
+                self.height = data["height"]
+            if "h_spacing" in data:
+                self.h_spacing = data["h_spacing"]
+            if "v_spacing" in data:
+                self.v_spacing = data["v_spacing"]
+            if "start" in data:
+                self.start = data["start"]
+            if "time_multiplier" in data:
+                self.time_multiplier = data["time_multiplier"]
+            if "slope_time" in data:
+                self.slope_time = data["slope_time"]
+            if "background" in data:
+                bg = data["background"]
+                self.background = (bg[0], bg[1], bg[2])
+            if "foreground" in data:
+                fg = data["foreground"]
+                self.foreground = (fg[0], fg[1], fg[2])
+            if "font_file" in data:
+                self.font_file = data["font_file"]
+            if "font_size" in data:
+                self.font_size = data["font_size"]
+
+        self.font = ImageFont.truetype(self.font_file, self.font_size)
+
         self.image = None
         self.draw = None
-        self.fontfile = "fonts/Roboto-Regular.ttf"
-
-        self.font = ImageFont.truetype(self.fontfile, 15)
-
         self.signals = []
         self.oldest = None
 
     def add_signal(self, signal):
+        if not signal.visible:
+            return
         name = signal.name
         history = signal.get_history()
         self.signals.append((name, history))

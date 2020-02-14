@@ -23,8 +23,10 @@ class SignalCollection():
           raise KeyError("All dependencies has not been registred.")
         self.dependent[dependency].append(signal)
 
-  def tick(self):
+  def tick(self, until_time):
     current_time, s = self.heap.pop_signal()
+    if until_time < current_time:
+      return False
     old_state, new_state, next_time = s.tick(current_time)
     if next_time:
       self.heap.add_signal(s, next_time)
@@ -33,7 +35,7 @@ class SignalCollection():
           s.name, old_state, new_state, current_time, next_time)
       if next_dependency_time:
         self.heap.add_signal(dependency, next_dependency_time)
-
+    return True
 
 class SignalHeap():
   def __init__(self):
@@ -61,3 +63,6 @@ class SignalHeap():
         del self.entry_finder[signal]
         return time, signal
     raise KeyError('pop from an empty priority queue')
+
+  def __len__(self):
+    return len(self.pq)

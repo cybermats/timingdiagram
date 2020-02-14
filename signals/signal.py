@@ -7,11 +7,12 @@ class Signal():
   DATA="DATA"
 
   def __init__(self, name,
-               initial_state=UNDEFINED,
-               dependencies=None):
+               initial_state=UNDEFINED):
     self.name = name
     self.state = initial_state
-    self.dependencies = dependencies
+    self.dependencies = []
+    self.visible = True
+    
     self.history = [(None, initial_state)]
 
   def tick(self, current_time):
@@ -32,17 +33,18 @@ class Signal():
 class FlipSignal(Signal):
   def __init__(self, name,
                initial_state,
-               states,
-               dependencies=None):
+               states):
     if not initial_state:
-      initial_state = Signal.UNDEFINED
-    if not states:
-      states = [Signal.UNDEFINED, Signal.DATA]
+      initial_state = Signal.LOW
 
-    self.states = states
     super().__init__(name,
-                     initial_state=initial_state,
-                     dependencies=dependencies)
+                     initial_state=initial_state)
+      
+    if not states:
+      states = [Signal.LOW, Signal.HIGH]
+
+    self.delay = 0
+    self.states = states
 
   def _flip(self):
     old_state = self.state
@@ -53,9 +55,11 @@ class FlipSignal(Signal):
     return old_state, new_state
 
 class TickerSignal(FlipSignal):
-  def __init__(self, name, initial_state=None, states=None,
-               period=None, frequency=None,
-               dependencies=None):
+  def __init__(self, name,
+               initial_state=None,
+               states=None,
+               period=None,
+               frequency=None):
     if not period and not frequency:
       raise ValueError("One of Period or Frequency has to be specified")
     if period and frequency:
@@ -63,8 +67,7 @@ class TickerSignal(FlipSignal):
     if frequency:
       period = 1 / frequency
     self.period = period
-    super().__init__(name, initial_state, states,
-                     dependencies=dependencies)
+    super().__init__(name, initial_state, states)
 
   def tick(self, current_time):
     super().tick(current_time)
@@ -77,9 +80,14 @@ class TickerSignal(FlipSignal):
     return self.period/2
 
 class CounterSignal(FlipSignal):
-  def __init__(self, name, initial_state=None, states=None, dependencies=None):
-    super().__init__(name, initial_state, states,
-                     dependencies=dependencies)
+  def __init__(self, name,
+               old_state_trigger=Signal.LOW,
+               new_state_trigger=Signal.HIGH,
+               initial_state=None,
+               states=None):
+    self.old_state_trigger = old_state_trigger
+    self.new_state_trigger = new_state_trigger
+    super().__init__(name, initial_state, states)
 
   def tick(self, current_time):
     super().tick(current_time)
@@ -89,7 +97,8 @@ class CounterSignal(FlipSignal):
     return old_state, new_state, None
 
   def context(self, s_name, old_state, new_state, current_time, next_time):
-    if old_state == Signal.UNDEFINED and new_state == Signal.DATA:
-      return current_time
+    if (old_state == self.old_state_trigger and
+        new_state == self.new_state_trigger):
+      return current_time + self.delay
     return None
 

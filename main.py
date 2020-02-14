@@ -1,34 +1,35 @@
-from signals.signal import TickerSignal, CounterSignal
+from signals.signal import TickerSignal, CounterSignal, Signal
 from signals.utils import SignalCollection
+from signals.json import deserialize
 from canvas import Canvas
+import json
 
-def main():
-    ts = TickerSignal("CLK", period=40)
-    cs = CounterSignal("CNTR", dependencies=["CLK"])
-    cs2 = CounterSignal("CNTR2", dependencies=["CNTR"])
+def main(filename):
+    with open(filename) as json_file:
+        data = json.load(json_file)
+    if "signals" not in data:
+        raise ValueError("Input file malformed. Missing 'signals'.")
+    if "canvas" not in data:
+        raise ValueError("Input file malformed. Missing 'canvas'.")
+
+    signals = deserialize(data["signals"])
+
     sc = SignalCollection()
-    sc.add(ts)
-    sc.add(cs)
-    sc.add(cs2)
-    next_time = 0
-    for _ in range(20):
-        sc.tick()
+    for signal in signals:
+        sc.add(signal)
+    
+    until_time=600
+    while sc.tick(until_time):
+        continue
 
-    cvs = Canvas(256, 256)
-    cvs.add_signal(ts)
-    cvs.add_signal(cs)
-    cvs.add_signal(cs2)
+    cvs = Canvas(data["canvas"])
+    for signal in signals:
+        cvs.add_signal(signal)
+        
     cvs.render()
     cvs.show()
-    print(ts.name)
-    print(ts.get_history())
-    print(cs.name)
-    print(cs.get_history())
-    print(cs2.name)
-    print(cs2.get_history())
-
 
 if __name__ == "__main__":
-    main()
+    main("tickers.json")
 
 
