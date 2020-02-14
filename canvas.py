@@ -12,6 +12,7 @@ class Canvas:
         self.slope_time = 5
         self.background = (255, 255, 255)
         self.foreground = (0, 0, 0)
+        self.linecolor = (64, 64, 255)
         self.font_file = "fonts/Roboto-Regular.ttf"
         self.font_size = 15
 
@@ -34,6 +35,9 @@ class Canvas:
             if "foreground" in data:
                 fg = data["foreground"]
                 self.foreground = (fg[0], fg[1], fg[2])
+            if "linecolor" in data:
+                c = data["linecolor"]
+                self.linecolor = (c[0], c[1], c[2])
             if "font_file" in data:
                 self.font_file = data["font_file"]
             if "font_size" in data:
@@ -44,6 +48,7 @@ class Canvas:
         self.image = None
         self.draw = None
         self.signals = []
+        self.causes = []
         self.oldest = None
 
     def add_signal(self, signal):
@@ -52,6 +57,9 @@ class Canvas:
         name = signal.name
         history = signal.history
         self.signals.append((name, history))
+        if signal.show_cause:
+            for cause in signal.causes:
+                self.causes.append(cause)
 
         age, _ = history[-1]
         if age is not None:
@@ -68,7 +76,9 @@ class Canvas:
         self.image = Image.new("RGB", (width, height), color=self.background)
         self.draw = ImageDraw.Draw(self.image)
         start = self.start
+        starts = {}
         for name, history in self.signals:
+            starts[name] = start
             size = self.draw.textsize(name, font=self.font)
             x = self.h_spacing - size[0]
             y = start + self.height/2 - (size[1]/2)
@@ -98,6 +108,26 @@ class Canvas:
               self.draw.line(line, fill=self.foreground)
 
             start = start + self.height + self.v_spacing
+
+        cause_lines = []
+        for cause in self.causes:
+            name, time = cause.event
+            if name not in starts:
+                continue
+            if time >= self.oldest:
+                continue
+            end_x = time * self.time_multiplier + self.h_spacing
+            end_y = starts[name] + self.height/2
+
+            for d_name, d_time in cause.dependencies.items():
+                if d_name not in starts:
+                    continue
+                print(d_name, d_time)
+                start_x = d_time * self.time_multiplier + self.h_spacing
+                start_y = starts[d_name] + self.height/2
+                cause_lines.append([(start_x, start_y), (end_x, end_y)])
+        for line in cause_lines:
+            self.draw.line(line, fill=self.linecolor)
 
     def _get_shape(self, prev_time, prev_state, curr_time, curr_state, last=False):
       lines = []

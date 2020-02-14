@@ -53,6 +53,11 @@ def deserialize(data):
 
     if s.delay is None or delay is not None:
         s.delay = delay
+
+    show_cause = True
+    if "show_cause" in data:
+        show_cause = data["show_cause"]
+    s.show_cause = show_cause
         
     return s
 

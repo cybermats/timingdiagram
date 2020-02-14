@@ -1,4 +1,3 @@
-
 class Signal():
   UNDEFINED="UNDEFINED"
   HIGH="HIGH"
@@ -14,6 +13,8 @@ class Signal():
     self.visible = None
     
     self.history = [(None, initial_state)]
+    self.causes = []
+    self.show_cause = True
 
   def tick(self, current_time):
     pass
@@ -102,7 +103,10 @@ class CounterSignal(FlipSignal):
   def context(self, s_name, old_state, new_state, current_time, next_time):
     if (old_state == self.old_state_trigger and
         new_state == self.new_state_trigger):
-      return current_time + self.delay
+      trigger_time = current_time + self.delay
+      self.causes.append(_Cause(orig_name=s_name, orig_time=current_time,
+                                event_name=self.name, event_time=trigger_time))
+      return trigger_time
     return None
 
 class ParameterSignal(FlipSignal):
@@ -118,6 +122,7 @@ class ParameterSignal(FlipSignal):
     self.dependency_states = dict()
     self.true_state = true_state
     self.current_state = False
+    self.cause = _Cause()
     
 
   def tick(self, current_time):
@@ -129,10 +134,15 @@ class ParameterSignal(FlipSignal):
 
   def context(self, s_name, old_state, new_state, current_time, next_time):
     self.dependency_states[s_name] = new_state
+    self.cause.add_cause(s_name, current_time)
     true_state = self._check_state()
     if true_state != self.current_state:
+      trigger_time = current_time + self.delay
+      self.cause.add_event(self.name, trigger_time)
+      self.causes.append(self.cause)
+      self.cause = _Cause()
       self.current_state = true_state
-      return current_time + self.delay
+      return trigger_time
     
   def set_dependency_state(self, name, value):
     self.dependency_states[name] = value
@@ -146,3 +156,26 @@ class ParameterSignal(FlipSignal):
         return False
 
     return True
+
+class _Cause():
+  def __init__(self,
+               orig_name=None,
+               orig_time=None,
+               event_name=None,
+               event_time=None):
+    print(orig_name, orig_time, event_name, event_time)
+    self.dependencies = {}
+    if orig_name is not None and orig_time is not None:
+      self.dependencies[orig_name] = orig_time
+    if event_name is not None and event_time is not None:
+      self.event = (event_name, event_time)
+
+  def add_cause(self, name, time):
+    print("add cause", name, time)
+    self.dependencies[name] = time
+
+  def add_event(self, name, time):
+    print("add event", name, time)
+    self.event = (name, time)
+
+

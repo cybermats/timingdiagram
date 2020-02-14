@@ -2,14 +2,14 @@
     "signals": [
 	{
 	    "type": "ticker",
-	    "name": "CLK",
-	    "period": 20,
-	    "visible": false
+	    "name": "PXL_CLK",
+	    "frequency": 0.025175,
+	    "visible": true
 	},
 	{
 	    "type": "counter",
 	    "name": "CNT_1",
-	    "dependencies": ["CLK"],
+	    "dependencies": ["PXL_CLK"],
 	    "visible": false
 	},
 	{
@@ -22,35 +22,57 @@
 	},
 	{
 	    "type": "counter",
-	    "name": "CNT_3",
+	    "name": "CHR_CLK",
 	    "old_state_trigger": "HIGH",
 	    "new_state_trigger": "LOW",
     	    "dependencies": ["CNT_2"],
-	    "visible": false
+	    "visible": true,
+	    "show_cause": false,
+	    "initial_state": "HIGH"
 	},
 	{
 	    "type": "parameter",
 	    "name": "TC",
 	    "true_state": {
-		"CLK": "LOW",
 		"CNT_1": "HIGH",
 		"CNT_2": "HIGH",
-		"CNT_3": "HIGH"
+		"CHR_CLK": "HIGH"
 	    },
-	    "initial_state": "LOW",
+	    "show_cause": false,
 	    "visible": true
+	},
+	{
+	    "type": "counter",
+	    "name": "MA",
+	    "old_state_trigger": "HIGH",
+	    "new_state_trigger": "LOW",
+	    "dependencies": ["CHR_CLK"],
+	    "initial_state": "DATA",
+	    "states": ["DATA"],
+	    "delay": 160
+	},
+	{
+	    "type": "counter",
+	    "name": "RA",
+	    "old_state_trigger": "HIGH",
+	    "new_state_trigger": "LOW",
+	    "dependencies": ["CHR_CLK"],
+	    "initial_state": "DATA",
+	    "states": ["DATA"],
+	    "delay": 160
 	}
     ],
     "canvas": {
 	"height": 40,
-	"h_spacing": 60,
+	"h_spacing": 80,
 	"v_spacing": 40,
 	"start": 40,
-	"time_multiplier": 2,
-	"slope_time": 0,
+	"time_multiplier": 0.5,
+	"slope_time": 1,
 	"background": [ 255, 255, 255],
 	"foreground": [ 0, 0, 0 ],
 	"font_file": "fonts/Roboto-Regular.ttf",
 	"font_size": 15
-    }
+    },
+    "time": 1200
 }
