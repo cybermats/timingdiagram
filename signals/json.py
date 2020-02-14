@@ -29,22 +29,43 @@ def deserialize(data):
     visible = True
     if "visible" in data:
         visible = data["visible"]
+        
+    if s.visible is None:
+        s.visible = visible
+        
     dependencies = None
     if "dependencies" in data:
         dependencies = data["dependencies"]
 
-    if s.visible is None:
-        s.visible = visible
-    if s.dependencies is None:
+    if s.dependencies is None or dependencies is not None:
         s.dependencies = dependencies
-    elif dependencies is not None:
-        s.dependencies += dependencies
+
+    states = None
+    if "states" in data:
+        states = data["states"]
+
+    if s.states is None or states is not None:
+        s.states = states
+
+    delay = None
+    if "delay" in data:
+        delay = data["delay"]
+
+    if s.delay is None or delay is not None:
+        s.delay = delay
+        
     return s
 
 def _create_ticker(data, name, initial_state):
-    if "period" not in data:
-        raise ValueError(f"[period] not present in Ticker {name}")
-    period = data["period"]
+    if "period" not in data and "frequency" not in data:
+        raise ValueError(f"Neither [period] nor [frequency] are present in Ticker {name}")
+    if "period" in data and "frequency" in data:
+        raise ValueError(f"Both [period] and [frequency] are present in Ticker {name}")
+    period = 1
+    if "frequency" in data:
+        period = 1 / data["frequency"]
+    else:
+        period = data["period"]
     return TickerSignal(name, initial_state=initial_state, period=period)
 
 def _create_counter(data, name, initial_state):
