@@ -3,13 +3,14 @@
 	{
 	    "type": "ticker",
 	    "name": "CLK",
-	    "period": 20
+	    "period": 20,
+	    "visible": false
 	},
 	{
 	    "type": "counter",
 	    "name": "CNT_1",
 	    "dependencies": ["CLK"],
-	    "visible": true
+	    "visible": false
 	},
 	{
 	    "type": "counter",
@@ -17,14 +18,15 @@
 	    "old_state_trigger": "HIGH",
 	    "new_state_trigger": "LOW",
     	    "dependencies": ["CNT_1"],
-	    "visible": true
+	    "visible": false
 	},
 	{
 	    "type": "counter",
 	    "name": "CNT_3",
 	    "old_state_trigger": "HIGH",
 	    "new_state_trigger": "LOW",
-    	    "dependencies": ["CNT_2"]
+    	    "dependencies": ["CNT_2"],
+	    "visible": false
 	},
 	{
 	    "type": "parameter",
@@ -35,7 +37,8 @@
 		"CNT_2": "HIGH",
 		"CNT_3": "HIGH"
 	    },
-	    "initial_state": "LOW"
+	    "initial_state": "LOW",
+	    "visible": true
 	}
     ],
     "canvas": {

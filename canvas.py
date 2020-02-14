@@ -77,20 +77,19 @@ class Canvas:
             lines = []
             prev_time = None
             prev_state = None
-            prev_time = None
             for (curr_time, curr_state) in history:
-              if curr_time:
-                lines += self._get_shape(prev_time, prev_state,
+                if curr_time:
+                    lines += self._get_shape(prev_time, prev_state,
                                      curr_time, curr_state)
-              else:
-                curr_time = 0
+                else:
+                    curr_time = 0
 
-              prev_time = curr_time
-              prev_state = curr_state
+                prev_time = curr_time
+                prev_state = curr_state
 
             if prev_time and prev_time < self.oldest:
-              lines += self._get_shape(prev_time, prev_state,
-                                   self.oldest, prev_state)
+                lines += self._get_shape(prev_time, prev_state,
+                                         self.oldest, prev_state)
 
             for line in lines:
               line = [(x + self.h_spacing, y + start) for
@@ -101,7 +100,10 @@ class Canvas:
 
     def _get_shape(self, prev_time, prev_state, curr_time, curr_state):
       lines = []
-      if prev_state is Signal.LOW and curr_state is Signal.HIGH:
+      #
+      # Transition from LOW to HIGH
+      #
+      if prev_state == Signal.LOW and curr_state == Signal.HIGH:
         prev_x = prev_time * self.time_multiplier
         prev_y = self.height
 
@@ -112,7 +114,10 @@ class Canvas:
               (curr_x - self.slope_time, prev_y)])
         lines.append([(curr_x - self.slope_time, prev_y),
                (curr_x + self.slope_time, curr_y)])
-      elif prev_state is Signal.HIGH and curr_state is Signal.LOW:
+      #
+      # Transition from HIGH to LOW
+      #
+      elif prev_state == Signal.HIGH and curr_state == Signal.LOW:
         prev_x = prev_time * self.time_multiplier
         prev_y = 0
 
@@ -123,7 +128,10 @@ class Canvas:
               (curr_x - self.slope_time, prev_y)])
         lines.append([(curr_x - self.slope_time, prev_y),
                (curr_x + self.slope_time, curr_y)])
-      elif prev_state is Signal.UNDEFINED and curr_state is Signal.DATA:
+      #
+      # Transition from UNDEFINED to DATA
+      #
+      elif prev_state == Signal.UNDEFINED and curr_state == Signal.DATA:
         prev_x = prev_time * self.time_multiplier
         curr_x = curr_time * self.time_multiplier
 
@@ -144,7 +152,10 @@ class Canvas:
         lines.append([(curr_x - self.slope_time, self.height),
               (curr_x + self.slope_time, 0)])
 
-      elif prev_state is Signal.DATA and curr_state is Signal.UNDEFINED:
+      #
+      # Transition from DATA to UNDEFINED
+      #
+      elif prev_state == Signal.DATA and curr_state == Signal.UNDEFINED:
         prev_x = prev_time * self.time_multiplier
         curr_x = curr_time * self.time_multiplier
 
@@ -160,6 +171,9 @@ class Canvas:
               (curr_x + self.slope_time, 0)])
 
 
+      #
+      # Transition from the same states
+      #
       elif prev_state == curr_state:
         if prev_state == Signal.LOW:
           prev_x = prev_time * self.time_multiplier
