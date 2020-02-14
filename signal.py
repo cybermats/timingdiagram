@@ -37,9 +37,9 @@ class FlipSignal(Signal):
                states,
                dependencies=None):
     if not initial_state:
-      initial_state = Signal.LOW
+      initial_state = Signal.UNDEFINED
     if not states:
-      states = [Signal.LOW, Signal.HIGH]
+      states = [Signal.UNDEFINED, Signal.DATA]
 
     self.states = states
     super().__init__(name,
@@ -91,7 +91,7 @@ class CounterSignal(FlipSignal):
     return old_state, new_state, None
 
   def context(self, s_name, old_state, new_state, current_time, next_time):
-    if old_state == Signal.LOW and new_state == Signal.HIGH:
+    if old_state == Signal.UNDEFINED and new_state == Signal.DATA:
       return current_time
     return None
 
